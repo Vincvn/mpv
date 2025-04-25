@@ -74,6 +74,13 @@ jobs:
         run: |
           cat ./build/meson-logs/testlog.txt
 
+      - name: Upload build artifacts
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-build-${{ matrix.config.cc }}
+          path: ./build/
+
   linux-fuzz:
     runs-on: ubuntu-latest
     container:
@@ -98,12 +105,16 @@ jobs:
         run: |
           cat ./build/meson-logs/meson-log.txt
 
+      - name: Upload fuzzers
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: fuzzers
+          path: ./build/
+
   linux-ffmpeg-6-1:
     runs-on: ubuntu-latest
     container:
-      # We want to test ffmpeg 6.1.1 which alpine 3.19 has exactly.
-      # Furthermore, this is a very minimal build of mpv without commonly
-      # used features to test build compatibility. Musl is a nice bonus as well
       image: alpine:3.19
     steps:
       - uses: actions/checkout@v4
@@ -148,3 +159,10 @@ jobs:
         if: ${{ failure() && steps.tests.outcome == 'failure' }}
         run: |
           cat ./build/meson-logs/testlog.txt
+
+      - name: Upload alpine build
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: linux-ffmpeg-6-1
+          path: ./build/
